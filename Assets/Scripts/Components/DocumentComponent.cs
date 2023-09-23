@@ -1,12 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Entities;
+using Unity.Entities.Serialization;
 using UnityEngine;
 
 public struct DocumentComponent : IComponentData
 {
-    public Entity Particle;
-    public int Count;
+    public Entity ParticleRendererPrefab;
+    public Entity EdgeRendererPrefab;
 }
 
 public readonly partial struct DocumentAspect : IAspect
@@ -15,7 +16,8 @@ public readonly partial struct DocumentAspect : IAspect
 
     private readonly RefRW<DocumentComponent> DocumentComponent;
 
-    public Entity ParticlePrefab => DocumentComponent.ValueRO.Particle;
+    public Entity ParticleRendererPrefab => DocumentComponent.ValueRO.ParticleRendererPrefab;
+    public Entity EdgeRendererPrefab => DocumentComponent.ValueRO.EdgeRendererPrefab;
 
 }
 

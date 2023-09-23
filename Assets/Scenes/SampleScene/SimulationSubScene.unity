@@ -258,9 +258,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b126ae05d539d70429804c37b91b2010, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ParticleEnt: {fileID: 4071977453939740506, guid: 444da99d9716ff0468bce3eb30167c3b,
+  ParticleRendererPrefab: {fileID: 746786046697200543, guid: 7e5d8ad37b930a94e986b75c68a77c62,
     type: 3}
-  Count: 0
+  EdgeRendererPrefab: {fileID: 2756358680375757708, guid: 74e1d0a57971a5249a8bdf53f4321203,
+    type: 3}
 --- !u!4 &1642301643
 Transform:
   m_ObjectHideFlags: 0
