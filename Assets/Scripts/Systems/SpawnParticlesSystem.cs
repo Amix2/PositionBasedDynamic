@@ -55,12 +55,12 @@ public partial struct SpawnParticlesSystem : ISystem
                 for (var z = 0; z < size.z; z++)
                 {
                     float3 position = basePoint + new float3(x * gap, y * gap, z * gap);
-                    Entity particle = pbdSpawner.SpawnParticle(manager, position);
+                    Entity particle = pbdSpawner.SpawnParticle(manager, position, new float3(0,-0.1f,0));
 
                     Entity particleRenderer = manager.Instantiate(ParticleRendererPrefab);
                     LocalTransform partTransform = new()
                     {
-                        Position = default,
+                        Position = default, 
                         Rotation = quaternion.identity,
                         Scale = particleRendererSize
                     };

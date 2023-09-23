@@ -14,6 +14,12 @@ namespace PositionBasedDynamic
         public static implicit operator float3(pbdPosition component) => component.Value;
     }
 
+    public struct pbdVelocity: IComponentData
+    {
+        public float3 Value;
+        public static implicit operator float3(pbdVelocity component) => component.Value;
+    }
+
     public struct pbdDualPositionRef : IComponentData
     {
         public Entity e0, e1;
