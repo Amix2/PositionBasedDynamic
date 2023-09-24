@@ -52,7 +52,7 @@ public partial struct SetRendererablesPositions : ISystem
         private void Execute(in ParticleTag particleTag, in RendererTag rendererTag, in OwnerComponent owner
             , ref LocalTransform transform)
         {
-            float3 pos = pbdPositions[owner];
+            float3 pos = pbdPositions[owner].float3();
 
             transform.Position = pos;
         }
@@ -69,8 +69,8 @@ public partial struct SetRendererablesPositions : ISystem
             , ref LocalTransform transform, ref PostTransformMatrix postTransformMatrix)
         {
             pbdDualPositionRef pdbDualPositionRef = pbdDualPositionRefs[owner];
-            float3 entAPos = pbdPositions[pdbDualPositionRef[0]];
-            float3 entBPos = pbdPositions[pdbDualPositionRef[1]];
+            float3 entAPos = pbdPositions[pdbDualPositionRef[0]].float3();
+            float3 entBPos = pbdPositions[pdbDualPositionRef[1]].float3();
 
             float len = math.distance(entAPos, entBPos);
             float3 center = (entAPos + entBPos) * 0.5f;

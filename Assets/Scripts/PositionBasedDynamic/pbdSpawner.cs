@@ -8,12 +8,19 @@ namespace PositionBasedDynamic
 {
     public static class pbdSpawner
     {
-        public static Entity SpawnParticle(EntityManager entityManager, float3 position, float3 velocity)
+        public static Entity SpawnParticle(EntityManager entityManager, double3 position, double3 velocity)
         {
-            Entity particle = entityManager.CreateEntity(typeof(pbdPosition), typeof(pbdVelocity), typeof(pbdParticle), typeof(pbdCorrectionVector));
+            Entity particle = entityManager.CreateEntity(
+                typeof(pbdPosition)
+                , typeof(pbdVelocity)
+                , typeof(pbdParticle)
+                , typeof(pbdLastStepPosition)
+                , typeof(pbdCorrectionVector));
             entityManager.SetComponentData(particle, new pbdPosition { Value = position });
             entityManager.SetComponentData(particle, new pbdVelocity { Value = velocity });
-            entityManager.SetComponentData(particle, new pbdParticle { Mass = 1, InvStiffness = 0 });
+            entityManager.SetComponentData(particle, new pbdParticle { Mass = 1, InvStiffness = 0.001 });
+            entityManager.SetComponentData(particle, new pbdLastStepPosition { Value = default });
+
             entityManager.SetName(particle, "pdbParticle");
 #if UNITY_EDITOR
 #endif

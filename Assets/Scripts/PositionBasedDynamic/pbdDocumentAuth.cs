@@ -5,7 +5,7 @@ namespace PositionBasedDynamic
 {
     public struct pbdDocumentComponent : IComponentData
     {
-        public float DeltaTime;
+        public double DeltaTime;
     }
 
     public class pbdDocumentAuth : MonoBehaviour

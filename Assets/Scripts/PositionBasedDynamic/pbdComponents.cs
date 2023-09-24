@@ -10,22 +10,30 @@ namespace PositionBasedDynamic
 {
     public struct pbdPosition : IComponentData
     {
-        public float3 Value;
-        public static implicit operator float3(pbdPosition component) => component.Value;
+        public double3 Value;
+        public static implicit operator double3(pbdPosition component) => component.Value;
+        public float3 float3() => new float3(Value);
+    }
+
+    public struct pbdLastStepPosition : IComponentData
+    {
+        public double3 Value;
+        public static implicit operator double3(pbdLastStepPosition component) => component.Value;
+        public float3 float3() => new float3(Value);
     }
 
     public struct pbdParticle : IComponentData
     {
-        public float Mass;
-        public float InvStiffness;
+        public double Mass;
+        public double InvStiffness;
     }
 
     [InternalBufferCapacity(16)]
     public struct pbdCorrectionVector : IBufferElementData
     {
-        public float3 Value;
-        public static implicit operator float3(pbdCorrectionVector component) => component.Value;
-        public pbdCorrectionVector(float3 value) {  Value = value; }
+        public double3 Value;
+        public static implicit operator double3(pbdCorrectionVector component) => component.Value;
+        public pbdCorrectionVector(double3 value) {  Value = value; }
     }
 
     public readonly partial struct pbsConstraintSolverAspect : IAspect
@@ -36,11 +44,11 @@ namespace PositionBasedDynamic
         private readonly RefRO<pbdParticle> ParticleC;
         private readonly DynamicBuffer<pbdCorrectionVector> CorrectionVectors;
 
-        public float3 Position => PositionC.ValueRO.Value;
-        public float Mass => ParticleC.ValueRO.Mass;
-        public float InvStiffness => ParticleC.ValueRO.InvStiffness;
+        public double3 Position => PositionC.ValueRO.Value;
+        public double Mass => ParticleC.ValueRO.Mass;
+        public double InvStiffness => ParticleC.ValueRO.InvStiffness;
 
-        public void AddCorrectionVector(EntityCommandBuffer.ParallelWriter ecb, int sortKey, float3 vector)
+        public void AddCorrectionVector(EntityCommandBuffer.ParallelWriter ecb, int sortKey, double3 vector)
         {
             ecb.AppendToBuffer(sortKey, Entity, new pbdCorrectionVector { Value = vector });
         }
@@ -50,8 +58,9 @@ namespace PositionBasedDynamic
 
     public struct pbdVelocity: IComponentData
     {
-        public float3 Value;
-        public static implicit operator float3(pbdVelocity component) => component.Value;
+        public double3 Value;
+        public static implicit operator double3(pbdVelocity component) => component.Value;
+        public float3 float3() => new float3(Value);
     }
 
     public struct pbdDualPositionRef : IComponentData
@@ -63,6 +72,6 @@ namespace PositionBasedDynamic
 
     public struct pbdEdge : IComponentData
     {
-        public float TargetLength;
+        public double TargetLength;
     }
 }

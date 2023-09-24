@@ -46,7 +46,7 @@ public partial struct SpawnParticlesSystem : ISystem
         float particleRendererSize = 0.1f;
         float gap = 1.0f;
         float3 basePoint = new(0, 2, 0);
-        int3 size = new int3(100, 100, 4);
+        int3 size = new int3(4, 4, 4);
 
         NativeArray3D<MassPoint> massPoints = new(size, Allocator.Temp);
 

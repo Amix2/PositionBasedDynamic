@@ -26,30 +26,41 @@ namespace PositionBasedDynamic
         public void OnUpdate(ref SystemState state)
         {
             var Document = SystemAPI.GetComponent<pbdDocumentComponent>(SystemAPI.GetSingletonEntity<DocumentComponent>());
-            float dt = Document.DeltaTime;
+            double dt = Document.DeltaTime;
 
             pbdPositions.Update(ref state);
             ConstraintSolverAspectLookup.Update(ref state);
+
+            new SaveLastStepPositionJob { }.ScheduleParallel();
 
             new ApplyVelocityJob { dt = dt }.ScheduleParallel();
 
             new CollisionResponseJob { }.ScheduleParallel();
 
             EntityCommandBuffer ecb = new(Allocator.TempJob);
-
             new DistanceConstraintJob { dt = dt, Lookup = ConstraintSolverAspectLookup, ecb = ecb.AsParallelWriter() }.ScheduleParallel();
-
             state.Dependency.Complete();    // TEMP
-
             ecb.Playback(state.EntityManager);
 
             new ApplyCorrectionVectors { }.ScheduleParallel();
+
+            new CalculateVelocityFromDXJob { dt = dt }.ScheduleParallel();  
+        }
+
+        [BurstCompile]
+        public partial struct SaveLastStepPositionJob : IJobEntity
+        {
+            [BurstCompile]
+            private void Execute(in pbdPosition position, ref pbdLastStepPosition lastStepPosition)
+            {
+                lastStepPosition.Value = position.Value;
+            }
         }
 
         [BurstCompile]
         public partial struct ApplyVelocityJob : IJobEntity
         {
-            public float dt;
+            public double dt;
 
             [BurstCompile]
             private void Execute(in pbdVelocity velocity, ref pbdPosition position)
@@ -73,31 +84,31 @@ namespace PositionBasedDynamic
         public partial struct DistanceConstraintJob : IJobEntity
         {
             [ReadOnly] public pbsConstraintSolverAspect.Lookup Lookup;
-            public float dt;
+            public double dt;
             public EntityCommandBuffer.ParallelWriter ecb;
 
             [BurstCompile]
             private void Execute(in pbdEdge edge, in pbdDualPositionRef dualPositionRef, [EntityIndexInQuery] int sortKey)
             {
-                float3 x1 = Lookup[dualPositionRef[0]].Position;
-                float3 x2 = Lookup[dualPositionRef[1]].Position;
-                float w1 = Lookup[dualPositionRef[0]].Mass;
-                float w2 = Lookup[dualPositionRef[1]].Mass;
+                double3 x1 = Lookup[dualPositionRef[0]].Position;
+                double3 x2 = Lookup[dualPositionRef[1]].Position;
+                double w1 = Lookup[dualPositionRef[0]].Mass;
+                double w2 = Lookup[dualPositionRef[1]].Mass;
 
-                float invStiff = (Lookup[dualPositionRef[0]].InvStiffness + Lookup[dualPositionRef[0]].InvStiffness) / 2;
+                double invStiff = (Lookup[dualPositionRef[0]].InvStiffness + Lookup[dualPositionRef[0]].InvStiffness) / 2;
 
-                float l = (x1 - x2).length();
-                float l0 = edge.TargetLength;
+                double l = (x1 - x2).length();
+                double l0 = edge.TargetLength;
 
-                float C = l - l0;   // constraint function
+                double C = l - l0;   // constraint function
 
-                float3 gC1 = -(x2 - x1) / l;
-                float3 gC2 = -gC1;
+                double3 gC1 = -(x2 - x1) / l;
+                double3 gC2 = -gC1;
 
-                float scalarLambda = -C / (w1 * gC1.lengthsq() + w2 * gC2.lengthsq() + (invStiff / (dt * dt)));
+                double scalarLambda = -C / (w1 * gC1.lengthsq() + w2 * gC2.lengthsq() + (invStiff / (dt * dt)));
 
-                float3 dx1 = scalarLambda * w1 * gC1;
-                float3 dx2 = scalarLambda * w2 * gC2;
+                double3 dx1 = scalarLambda * w1 * gC1;
+                double3 dx2 = scalarLambda * w2 * gC2;
 
                 Lookup[dualPositionRef[0]].AddCorrectionVector(ecb, sortKey, dx1);
                 Lookup[dualPositionRef[1]].AddCorrectionVector(ecb, sortKey, dx2);
@@ -113,6 +124,18 @@ namespace PositionBasedDynamic
                 for (int i = 0; i < correctionVectors.Length; i++)
                     position.Value += correctionVectors[i].Value;
                 correctionVectors.Clear();
+            }
+        }
+
+        [BurstCompile]
+        public partial struct CalculateVelocityFromDXJob : IJobEntity
+        {
+            public double dt;
+
+            [BurstCompile]
+            private void Execute(in pbdLastStepPosition lastStepPosition, in pbdPosition position, ref pbdVelocity velocity)
+            {
+                velocity.Value = (position.Value / dt - lastStepPosition.Value / dt);
             }
         }
     }
