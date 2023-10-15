@@ -290,7 +290,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a2ac884a0ca85aa46bfa56f70d5791df, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  DeltaTime: 0.1
+  DeltaTime: 0.01
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

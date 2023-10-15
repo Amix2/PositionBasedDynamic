@@ -69,7 +69,23 @@ namespace PositionBasedDynamic
 
         public Entity this[int i] => i == 0 ? e0 : e1;
     }
-
+    
+    public struct pbdTetrahedron : IComponentData
+    {
+        public Entity e0, e1, e2, e3;
+        public Entity Entity(int id) 
+        { 
+            switch(id) 
+            {
+                case 0: return e0;
+                case 1: return e1;
+                case 2: return e2;
+                case 3: return e3;
+            }
+            return e0;
+        }
+        public double TargetVolume;
+    }
     public struct pbdEdge : IComponentData
     {
         public double TargetLength;
